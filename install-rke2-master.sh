@@ -154,7 +154,7 @@ ln -s /etc/rancher/rke2/rke2.yaml ~/.kube/config
 #---------------------------------------------------------------------------
 
 # Sleep for 3 minutes to make sure all previous executions are completed
-sleep 180
+#sleep 180
 
 #---------------------------------------------------------------------------
 
