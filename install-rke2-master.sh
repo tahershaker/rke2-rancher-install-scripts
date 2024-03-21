@@ -16,10 +16,10 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export SELF_PUB_IP="18.132.14.137"
-export SELF_PRIV_IP="172.31.30.226"
-export WORKER_IP="172.31.17.220"
-export RANCHER_MGMT_FQDN="rancher-manager.18-132-14-137.sslip.io"
+export SELF_PUB_IP="35.179.94.114"
+export SELF_PRIV_IP="172.31.104.151"
+export WORKER_IP="172.31.97.173"
+export RANCHER_MGMT_FQDN="rancher-manager.35-179-94-114.sslip.io"
 
 #---------------------------------------------------------------------------
 
