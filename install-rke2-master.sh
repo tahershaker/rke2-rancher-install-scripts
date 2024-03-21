@@ -16,7 +16,7 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export RANCHER_MGMT_FQDN=""
+export RANCHER_MGMT_FQDN="https://rancher-manager.13-42-21-57.sslip.io"
 
 
 #---------------------------------------------------------------------------

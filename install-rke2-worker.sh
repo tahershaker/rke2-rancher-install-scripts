@@ -12,7 +12,7 @@
 #------------------------------------------------------
 
 # Set required variables
-export SERVER_IP=""
+export SERVER_IP="172.31.96.224"
 
 # Configure hostname 
 sudo hostnamectl set-hostname worker-01.rke2-testing.io
