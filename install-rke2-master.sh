@@ -15,16 +15,18 @@ set -x
 
 #------------------------------------------------------
 
-# Set required variables
-export RANCHER_MGMT_FQDN="https://rancher-manager.13-42-21-57.sslip.io"
-
-
 #---------------------------------------------------------------------------
 
 ### Configure Hostnames and DNS
 
 # Configure hostname 
 sudo hostnamectl set-hostname master-01.rke2-testing.io
+
+# Edit /etc/hosts
+cat << EOF >> /etc/hosts
+127.0.1.1          worker-01.rke2-testing.io
+10.10.1.11         master-01.rke2-testing.io
+EOF
 
 #---------------------------------------------------------------------------
 
@@ -92,7 +94,7 @@ spec:
   createNamespace: true
   version: v2.8.2
   set:
-    hostname: "${RANCHER_MGMT_FQDN}"
+    hostname: "rancher-manager.13-42-21-57.sslip.io"
     bootstrapPassword: "RancherDemo@123"
 EOF
 
