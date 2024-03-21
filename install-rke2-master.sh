@@ -106,33 +106,9 @@ spec:
   set:
     hostname: "${RANCHER_MGMT_FQDN}"
     bootstrapPassword: "RancherDemo@123"
+    replicas: 1
 EOF
 
-# Create a Helm Chart to deploy Rancher CSI Benchmarks CRDs
-cat << EOF >> /var/lib/rancher/rke2/server/manifests/rke2-csi-benchmark-crd.yaml
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: rancher-cis-benchmark-crd
-spec:
-  chart: rancher-cis-benchmark-crd
-  repo: https://charts.rancher.io
-  targetNamespace: cis-operator-system
-  createNamespace: true
-EOF
-
-# Create a Helm Chart to deploy Rancher CSI Benchmarks
-cat << EOF >> /var/lib/rancher/rke2/server/manifests/rke2-csi-benchmark.yaml
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: rancher-cis-benchmark
-spec:
-  chart: rancher-cis-benchmark
-  repo: https://charts.rancher.io
-  targetNamespace: cis-operator-system
-  createNamespace: true
-EOF
 
 #---------------------------------------------------------------------------
 
