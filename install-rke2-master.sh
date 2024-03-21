@@ -25,7 +25,7 @@ sudo hostnamectl set-hostname master-01.rke2-testing.io
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
 127.0.1.1          worker-01.rke2-testing.io
-10.10.1.11         master-01.rke2-testing.io
+172.31.104.196         master-01.rke2-testing.io
 EOF
 
 #---------------------------------------------------------------------------
@@ -52,6 +52,10 @@ cni: "calico"
 cluster-cidr: "172.16.0.0/16"
 service-cidr: "172.17.0.0/16"
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
+tls-san:
+  - master-01.rke2-testing.io
+  - 172.31.96.224
+  - 35.177.61.198
 EOF
 
 #---------------------------------------------------------------------------
@@ -94,7 +98,7 @@ spec:
   createNamespace: true
   version: v2.8.2
   set:
-    hostname: "rancher-manager.13-42-21-57.sslip.io"
+    hostname: "rancher-manager.35-177-61-198.sslip.io"
     bootstrapPassword: "RancherDemo@123"
 EOF
 

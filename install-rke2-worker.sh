@@ -17,7 +17,7 @@ sudo hostnamectl set-hostname worker-01.rke2-testing.io
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
 127.0.1.1          worker-01.rke2-testing.io
-10.10.1.11         master-01.rke2-testing.io
+172.31.102.80         master-01.rke2-testing.io
 EOF
 
 # Install Helm
