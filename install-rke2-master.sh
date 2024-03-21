@@ -15,6 +15,12 @@ set -x
 
 #------------------------------------------------------
 
+# Set required variables
+export SELF_PUB_IP="18.132.14.137"
+export SELF_PRIV_IP="172.31.30.226"
+export WORKER_IP="172.31.17.220"
+export RANCHER_MGMT_FQDN="rancher-manager.18-132-14-137.sslip.io"
+
 #---------------------------------------------------------------------------
 
 ### Configure Hostnames and DNS
@@ -24,8 +30,8 @@ sudo hostnamectl set-hostname master-01.rke2-testing.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          worker-01.rke2-testing.io
-172.31.104.196         master-01.rke2-testing.io
+127.0.1.1          master-01.rke2-testing.io
+$WORKER_IP         worker-01.rke2-testing.io
 EOF
 
 #---------------------------------------------------------------------------
@@ -54,8 +60,8 @@ service-cidr: "172.17.0.0/16"
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 tls-san:
   - master-01.rke2-testing.io
-  - 172.31.96.224
-  - 35.177.61.198
+  - $SELF_PUB_IP
+  - $SELF_PRIV_IP
 EOF
 
 #---------------------------------------------------------------------------
@@ -98,7 +104,7 @@ spec:
   createNamespace: true
   version: v2.8.2
   set:
-    hostname: "rancher-manager.35-177-61-198.sslip.io"
+    hostname: "${RANCHER_MGMT_FQDN}"
     bootstrapPassword: "RancherDemo@123"
 EOF
 
