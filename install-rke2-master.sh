@@ -26,12 +26,12 @@ export RANCHER_MGMT_FQDN="rancher-manager.35-219-248-245.sslip.io"
 ### Configure Hostnames and DNS
 
 # Configure hostname 
-sudo hostnamectl set-hostname master-01.rancher-demo.io
+sudo hostnamectl set-hostname mgmt-master-01.rancher-demo.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          master-01.rancher-demo.io
-$WORKER_IP         worker-01.rancher-demo.io
+127.0.1.1          mgmt-master-01.rancher-demo.io
+$WORKER_IP         mgmt-worker-01.rancher-demo.io
 EOF
 
 #---------------------------------------------------------------------------

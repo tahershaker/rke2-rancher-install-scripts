@@ -20,12 +20,12 @@ export MASTER_IP="10.10.10.10"
 #------------------------------------------------------
 
 # Configure hostname 
-sudo hostnamectl set-hostname worker-01.rancher-demo.io
+sudo hostnamectl set-hostname mgmt-worker-01.rancher-demo.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          worker-01.rancher-demo.io
-$MASTER_IP         master-01.rrancher-demo.io
+127.0.1.1          mgmt-worker-01.rancher-demo.io
+$MASTER_IP         mgmt-master-01.rrancher-demo.io
 EOF
 
 # Install Helm
