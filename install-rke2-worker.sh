@@ -25,7 +25,7 @@ sudo hostnamectl set-hostname mgmt-worker-01.rancher-demo.io
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
 127.0.1.1          mgmt-worker-01.rancher-demo.io
-$MASTER_IP         mgmt-master-01.rrancher-demo.io
+$MASTER_IP         mgmt-master-01.rancher-demo.io
 EOF
 
 # Install Helm
@@ -39,7 +39,7 @@ mv /usr/local/bin/helm /usr/bin/helm
 mkdir -p /etc/rancher/rke2/
 cat << EOF >> /etc/rancher/rke2/config.yaml
 write-kubeconfig-mode: "0644"
-server: https://master-01.rancher-demo.io:9345
+server: https://mgmt-master-01.rancher-demo.io:9345
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 EOF
 
