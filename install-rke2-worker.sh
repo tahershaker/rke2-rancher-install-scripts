@@ -15,17 +15,17 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export MASTER_IP="10.109.109.3"
+export MASTER_IP="10.10.10.10"
 
 #------------------------------------------------------
 
 # Configure hostname 
-sudo hostnamectl set-hostname worker-01.rke2-testing.io
+sudo hostnamectl set-hostname worker-01.rancher-demo.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          worker-01.rke2-testing.io
-$MASTER_IP         master-01.rke2-testing.io
+127.0.1.1          worker-01.rancher-demo.io
+$MASTER_IP         master-01.rrancher-demo.io
 EOF
 
 # Install Helm
@@ -39,7 +39,7 @@ mv /usr/local/bin/helm /usr/bin/helm
 mkdir -p /etc/rancher/rke2/
 cat << EOF >> /etc/rancher/rke2/config.yaml
 write-kubeconfig-mode: "0644"
-server: https://master-01.rke2-testing.io:9345
+server: https://master-01.rancher-demo.io:9345
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 EOF
 

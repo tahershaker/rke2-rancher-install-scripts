@@ -16,22 +16,22 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export SELF_PUB_IP="34.38.175.177"
-export SELF_PRIV_IP="10.109.109.3"
-export WORKER_IP="10.109.109.4"
-export RANCHER_MGMT_FQDN="rancher-manager.34-38-175-177.sslip.io"
+export SELF_PUB_IP="35.219.248.245"
+export SELF_PRIV_IP="10.10.10.10"
+export WORKER_IP="10.10.10.11"
+export RANCHER_MGMT_FQDN="rancher-manager.35-219-248-245.sslip.io"
 
 #---------------------------------------------------------------------------
 
 ### Configure Hostnames and DNS
 
 # Configure hostname 
-sudo hostnamectl set-hostname master-01.rke2-testing.io
+sudo hostnamectl set-hostname master-01.rancher-demo.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          master-01.rke2-testing.io
-$WORKER_IP         worker-01.rke2-testing.io
+127.0.1.1          master-01.rancher-demo.io
+$WORKER_IP         worker-01.rancher-demo.io
 EOF
 
 #---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ cluster-cidr: "172.16.0.0/16"
 service-cidr: "172.17.0.0/16"
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 tls-san:
-  - master-01.rke2-testing.io
+  - master-01.rancher-demo.io
   - $SELF_PUB_IP
   - $SELF_PRIV_IP
 EOF
@@ -107,6 +107,32 @@ spec:
     hostname: "${RANCHER_MGMT_FQDN}"
     bootstrapPassword: "RancherDemo@123"
     replicas: 1
+EOF
+
+# Create a Helm Chart to deploy Rancher CSI Benchmarks CRDs
+cat << EOF >> /var/lib/rancher/rke2/server/manifests/rke2-csi-benchmark-crd.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-cis-benchmark-crd
+spec:
+  chart: rancher-cis-benchmark-crd
+  repo: https://charts.rancher.io
+  targetNamespace: cis-operator-system
+  createNamespace: true
+EOF
+
+# Create a Helm Chart to deploy Rancher CSI Benchmarks
+cat << EOF >> /var/lib/rancher/rke2/server/manifests/rke2-csi-benchmark.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-cis-benchmark
+spec:
+  chart: rancher-cis-benchmark
+  repo: https://charts.rancher.io
+  targetNamespace: cis-operator-system
+  createNamespace: true
 EOF
 
 
