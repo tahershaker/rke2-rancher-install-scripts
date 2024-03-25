@@ -20,7 +20,7 @@ export MASTER_IP="10.10.10.10"
 #------------------------------------------------------
 
 # Configure hostname 
-sudo hostnamectl set-hostname mgmt-worker-01.rancher-demo.io
+#sudo hostnamectl set-hostname mgmt-worker-01.rancher-demo.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
