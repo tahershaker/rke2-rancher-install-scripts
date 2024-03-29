@@ -15,18 +15,25 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export MASTER_IP="10.10.10.10"
+export MASTER_PRIV_IP="10.10.10.162"
+export WORKER_01_IP="10.10.10.53"
+export BASTION_NOST_IP="10.10.1.138"
+export BASTION_NOST_FQDN="demo-a-bastion-01.rancher-demo.io"
+export BASTION_NOST_FQDN_SHORT="demo-a-bastion-01"
+export MASTER_NODE_FQDN="demo-a-mgmt-master-01.rancher-demo.io"
+export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
+export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
+export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
 
-#------------------------------------------------------
 
-# Configure hostname 
-#sudo hostnamectl set-hostname mgmt-worker-01.rancher-demo.io
+#---------------------------------------------------------------------------
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          mgmt-worker-01.rancher-demo.io
-$MASTER_IP         mgmt-master-01.rancher-demo.io
+$BASTION_NOST_IP         $BASTION_NOST_FQDN $BASTION_NOST_FQDN_SHORT
+$MASTER_PRIV_IP         $MASTER_NODE_FQDN $MASTER_NODE_FQDN_SHORT
 EOF
+
 
 # Install Helm
 mkdir -p /opt/rancher/helm
@@ -39,7 +46,7 @@ mv /usr/local/bin/helm /usr/bin/helm
 mkdir -p /etc/rancher/rke2/
 cat << EOF >> /etc/rancher/rke2/config.yaml
 write-kubeconfig-mode: "0644"
-server: https://mgmt-master-01.rancher-demo.io:9345
+server: https://$MASTER_PRIV_IP:9345
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 EOF
 

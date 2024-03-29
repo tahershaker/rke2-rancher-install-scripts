@@ -16,30 +16,39 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export SELF_PUB_IP="35.219.248.245"
-export SELF_PRIV_IP="10.10.10.10"
-export WORKER_IP="10.10.10.11"
+export MASTER_PUB_IP="3.10.126.243"
+export MASTER_PRIV_IP="10.10.10.162"
+export WORKER_01_IP="10.10.10.53"
+export BASTION_NOST_IP="10.10.1.138"
+export BASTION_NOST_FQDN="demo-a-bastion-01.rancher-demo.io"
+export BASTION_NOST_FQDN_SHORT="demo-a-bastion-01"
+export MASTER_NODE_FQDN="demo-a-mgmt-master-01.rancher-demo.io"
+export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
+export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
+export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
+export MASTER_NODE_LB_FQDN="demo-a-mgmt-master-01.3-10-126-243.sslip.io"
 export RANCHER_MGMT_FQDN="rancher-manager.35-219-248-245.sslip.io"
+export BUCKET_NAME="demo-a-bucket-01"
+export BUCKET_END_POINT="s3.eu-west-2.amazonaws.com"
+export REGION="eu-west-2"
+export S3_USER_ACCESS_KEY="QUtJQVpRM0RRQUxNUkFTRk40NTQ="
+export S3_USER_ACCESS_SECRET_KEY="YXp5Q215R293QU1QNE9FREc0dXU5cUZpODVFZHFXTW9qeE56b1o2Rg=="
 
 #---------------------------------------------------------------------------
-
-### Configure Hostnames and DNS
-
-# Configure hostname 
-#sudo hostnamectl set-hostname mgmt-master-01.rancher-demo.io
 
 # Edit /etc/hosts
 cat << EOF >> /etc/hosts
-127.0.1.1          mgmt-master-01.rancher-demo.io
-$WORKER_IP         mgmt-worker-01.rancher-demo.io
+$BASTION_NOST_IP         $BASTION_NOST_FQDN $BASTION_NOST_FQDN_SHORT
+$WORKER_01_IP         $WORKER_NODE_FQDN $WORKER_NODE_FQDN_SHORT
 EOF
-
-#---------------------------------------------------------------------------
 
 ### Create required directories
 
 # Create a directory for the Yaml Files
-mkdir -p /home/ec2-user/yamlfiles
+mkdir -p yaml-files
+
+# Create a directory for the Helm Charts Vlaues Files
+mkdir -p helm-values-files
 
 # Create RKE configuration directory
 mkdir -p /etc/rancher/rke2/
@@ -51,6 +60,86 @@ mkdir -p /var/lib/rancher/rke2/server/manifests/
 
 ### Create required files with its contents
 
+# Create the Rancher Backup S3 User Access Yaml File
+cat << EOF >> yaml-files/rancher-backup-s3-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: s3-creds
+type: Opaque
+data:
+  accessKey: "${S3_USER_ACCESS_KEY}"
+  secretKey: "${S3_USER_ACCESS_SECRET_KEY}"
+EOF
+
+# Create the Rancher encruption provider config File
+cat << EOF >> yaml-files/encryption-provider-config.yaml
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aesgcm:
+          keys:
+            - name: key1
+              secret: c2VjcmV0IGlzIHNlY3VyZQ==
+EOF
+
+# Create the cluster storage class
+cat << EOF >> yaml-files/storage-class.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+EOF
+
+# Create the Keycloak PersistentVolume
+cat << EOF >> yaml-files/keycloak-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-pv
+  namespace: keycloak
+spec:
+  storageClassName: local-storage
+  claimRef:
+    name: keycloak-volume
+    namespace: keycloak
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  local:
+    path: /mnt/
+  nodeAffinity:
+   required:
+    nodeSelectorTerms:
+    - matchExpressions:
+      - key: kubernetes.io/hostname
+        operator: In
+        values:
+        - $WORKER_NODE_FQDN
+EOF
+
+# Create the Keycloak PersistentVolumeClaim
+cat << EOF >> yaml-files/keycloak-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-volume
+  namespace: keycloak
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-storage
+EOF
+
 # Create the RKE2 Configuration file
 cat << EOF >> /etc/rancher/rke2/config.yaml
 write-kubeconfig-mode: "0644"
@@ -59,9 +148,9 @@ cluster-cidr: "172.16.0.0/16"
 service-cidr: "172.17.0.0/16"
 token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 tls-san:
-  - master-01.rancher-demo.io
-  - $SELF_PUB_IP
-  - $SELF_PRIV_IP
+  - $MASTER_NODE_LB_FQDN
+  - $MASTER_PUB_IP
+  - $MASTER_PRIV_IP
 EOF
 
 #---------------------------------------------------------------------------
@@ -104,7 +193,7 @@ spec:
   createNamespace: true
   version: v2.8.2
   set:
-    hostname: "${RANCHER_MGMT_FQDN}"
+    hostname: "$RANCHER_MGMT_FQDN"
     bootstrapPassword: "RancherDemo@123"
     replicas: 1
 EOF
@@ -135,6 +224,43 @@ spec:
   createNamespace: true
 EOF
 
+# Create a Helm Chart to deploy Rancher Backup CRDs
+cat << EOF >> /var/lib/rancher/rke2/server/manifests/rke2-rancher-backup-crd.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-backup-crd
+spec:
+  chart: rancher-backup-crd
+  repo: https://charts.rancher.io
+  targetNamespace: cattle-resources-system
+  createNamespace: true
+EOF
+
+# Create a Helm Chart to deploy Rancher Backup
+cat << EOF >> /var/lib/rancher/rke2/server/manifests/rke2-rancher-backup.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-backup
+spec:
+  chart: rancher-backup
+  repo: https://charts.rancher.io
+  targetNamespace: cattle-resources-system
+  createNamespace: true
+  valuesContent: |-
+    s3:
+      enabled: true
+      credentialSecretName: s3-creds
+      credentialSecretNamespace: default
+      bucketName: "${BUCKET_NAME}"
+      endpoint: "${BUCKET_END_POINT}"
+      insecureTLSSkipVerify: true
+      region: "${REGION}"
+    persistence:
+      enabled: false
+EOF
+
 
 #---------------------------------------------------------------------------
 
@@ -156,11 +282,28 @@ ln -s /etc/rancher/rke2/rke2.yaml ~/.kube/config
 #---------------------------------------------------------------------------
 
 # Sleep for 3 minutes to make sure all previous executions are completed
-#sleep 180
+sleep 120
 
 #---------------------------------------------------------------------------
 
 ### Perform required kubectl commands
 
+# Create Keycloak Namespace
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml create namespace keycloak
+
+# Create the Rancher Bakcup S3 Secret
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f yaml-files/rancher-backup-s3-secret.yaml
+
+# Create the secret for the rancher backup encryption
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml create secret generic encryptionconfig --from-file=yaml-files/encryption-provider-config.yaml -n cattle-resources-system
+
+# Create Storage Class
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f yaml-files/storage-class.yaml
+
+# Create Keycloak PV
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f yaml-files/keycloak-pv.yaml
+
+# Create keycloak PVC
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f yaml-files/keycloak-pvc.yaml
 
 #---------------------------------------------------------------------------
