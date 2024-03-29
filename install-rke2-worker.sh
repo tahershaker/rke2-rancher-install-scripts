@@ -15,9 +15,9 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export MASTER_PRIV_IP="10.10.10.162"
-export WORKER_01_IP="10.10.10.53"
-export BASTION_NOST_IP="10.10.1.138"
+export MASTER_PRIV_IP="xxx"
+export WORKER_01_IP="xxx"
+export BASTION_NOST_IP="xxx"
 export BASTION_NOST_FQDN="demo-a-bastion-01.rancher-demo.io"
 export BASTION_NOST_FQDN_SHORT="demo-a-bastion-01"
 export MASTER_NODE_FQDN="demo-a-mgmt-master-01.rancher-demo.io"

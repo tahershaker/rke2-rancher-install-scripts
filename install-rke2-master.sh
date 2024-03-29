@@ -16,25 +16,25 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-export MASTER_PUB_IP="3.10.126.243"
-export MASTER_PRIV_IP="10.10.10.162"
-export WORKER_01_IP="10.10.10.53"
-export BASTION_NOST_IP="10.10.1.138"
+export MASTER_PUB_IP="xxx"
+export MASTER_PRIV_IP="xxx"
+export WORKER_01_IP="xxx"
+export BASTION_NOST_IP="xxx"
 export BASTION_NOST_FQDN="demo-a-bastion-01.rancher-demo.io"
 export BASTION_NOST_FQDN_SHORT="demo-a-bastion-01"
 export MASTER_NODE_FQDN="demo-a-mgmt-master-01.rancher-demo.io"
 export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
 export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
 export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
-export MASTER_NODE_LB_FQDN="demo-a-mgmt-master-01.3-10-126-243.sslip.io"
-export RANCHER_MGMT_FQDN="rancher-manager.3-10-126-243.sslip.io"
-export BUCKET_NAME="demo-a-bucket-01"
-export BUCKET_END_POINT="s3.eu-west-2.amazonaws.com"
-export REGION="eu-west-2"
+export MASTER_NODE_LB_FQDN="demo-a-mgmt-master-01.xxx.sslip.io"
+export RANCHER_MGMT_FQDN="rancher-manager.xxx.sslip.io"
+export BUCKET_NAME="xxx"
+export BUCKET_END_POINT="s3.xxx.amazonaws.com"
+export REGION="xxx"
 export S3_USER_ACCESS_KEY="xxx="
 export S3_USER_ACCESS_SECRET_KEY="xxx"
-export KEYCLOAK_URL="http://keycloak.3-10-126-243.sslip.io"
-export KEYCLOAK_AUTH_URL="http://keycloak.3-10-126-243.sslip.io/auth"
+export KEYCLOAK_URL="http://keycloak.xxx.sslip.io"
+export KEYCLOAK_AUTH_URL="http://keycloak.xxx.sslip.io/auth"
 
 #---------------------------------------------------------------------------
 
