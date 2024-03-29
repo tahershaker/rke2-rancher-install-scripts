@@ -27,12 +27,14 @@ export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
 export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
 export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
 export MASTER_NODE_LB_FQDN="demo-a-mgmt-master-01.3-10-126-243.sslip.io"
-export RANCHER_MGMT_FQDN="rancher-manager.35-219-248-245.sslip.io"
+export RANCHER_MGMT_FQDN="rancher-manager.3-10-126-243.sslip.io"
 export BUCKET_NAME="demo-a-bucket-01"
 export BUCKET_END_POINT="s3.eu-west-2.amazonaws.com"
 export REGION="eu-west-2"
-export S3_USER_ACCESS_KEY="QUtJQVpRM0RRQUxNUkFTRk40NTQ="
-export S3_USER_ACCESS_SECRET_KEY="YXp5Q215R293QU1QNE9FREc0dXU5cUZpODVFZHFXTW9qeE56b1o2Rg=="
+export S3_USER_ACCESS_KEY="xxx="
+export S3_USER_ACCESS_SECRET_KEY="xxx"
+export KEYCLOAK_URL="http://keycloak.3-10-126-243.sslip.io"
+export KEYCLOAK_AUTH_URL="http://keycloak.3-10-126-243.sslip.io/auth"
 
 #---------------------------------------------------------------------------
 
@@ -49,6 +51,9 @@ mkdir -p yaml-files
 
 # Create a directory for the Helm Charts Vlaues Files
 mkdir -p helm-values-files
+
+# Create a directory for the keycloak Helm Charts Vlaues Files
+mkdir -p helm-values-files/keycloak
 
 # Create RKE configuration directory
 mkdir -p /etc/rancher/rke2/
@@ -138,6 +143,40 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: local-storage
+EOF
+
+# Create the Keycloak Helm Value Files
+cat << EOF >> helm-values-files/keycloak/valuse.yaml
+replicas: 1
+extraEnv: |
+  - name: KEYCLOAK_USER
+    value:  demo-admin
+  - name: KEYCLOAK_PASSWORD
+    value: RancherDemo@123
+  - name: KEYCLOAK_FRONTEND_URL
+    value: "$KEYCLOAK_AUTH_URL"
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  servicePort: http
+  annotations:
+    ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+  rules:
+    -
+      host: $KEYCLOAK_URL
+      paths:
+        - path: /
+          pathType: Prefix
+postgresql:
+  enabled: true
+  postgresqlUsername: keycloak
+  postgresqlPassword: keycloak
+  postgresqlDatabase: keycloak
+  networkPolicy:
+    enabled: false
+  persistence:
+    existingClaim: keycloak-volume
 EOF
 
 # Create the RKE2 Configuration file
