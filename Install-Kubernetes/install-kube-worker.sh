@@ -15,7 +15,7 @@ set -x
 #------------------------------------------------------
 
 # Set required variables
-KUBEVERSION=1.20.4-00
+KUBEVERSION=1.26.10-00
 
 #Install Containerd On Server
 #References: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
