@@ -4,7 +4,7 @@
 
 #######################################################
 ###     This script will be used to bootstrap       ###
-### the Worker Node in the management cluster with  ###
+###  the Worker Node in an RKE2 Environment with    ###
 ### the required configuration and setup/configure  ###
 ###          required software and tools            ###
 #######################################################
@@ -24,6 +24,7 @@ export MASTER_NODE_FQDN="demo-a-mgmt-master-01.rancher-demo.io"
 export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
 export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
 export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
+export KUBE_VERSION="v1.26"
 
 
 #---------------------------------------------------------------------------
@@ -51,7 +52,7 @@ token: SuseRKE2token!!5s84s9f9e3d2f2x3f1
 EOF
 
 # Install RKE2 agent
-curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL="v1.26" INSTALL_RKE2_TYPE="agent" sh -
+curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=$KUBE_VERSION INSTALL_RKE2_TYPE="agent" sh -
 
 # Enable and start RKE2 agent service
 systemctl enable rke2-agent.service

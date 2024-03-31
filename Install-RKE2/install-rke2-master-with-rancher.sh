@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
-
 #=====================
 
 #######################################################
@@ -27,6 +25,7 @@ export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
 export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
 export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
 export MASTER_NODE_LB_FQDN="demo-a-mgmt-master-01.xxx.sslip.io"
+export KUBE_VERSION="v1.26"
 export RANCHER_MGMT_FQDN="rancher-manager.xxx.sslip.io"
 export BUCKET_NAME="xxx"
 export BUCKET_END_POINT="s3.xxx.amazonaws.com"
@@ -306,7 +305,7 @@ EOF
 ### Install RKE2
 
 # Install RKE2 server
-curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL="v1.26" INSTALL_RKE2_TYPE="server" sh -
+curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=$KUBE_VERSION INSTALL_RKE2_TYPE="server" sh -
 
 # Enable and start RKE2 server service
 systemctl enable rke2-server.service
