@@ -14,26 +14,39 @@ set -x
 
 #------------------------------------------------------
 
-# Set required variables
+# Set required variables for installing kubernetes
 export KUBEVERSION="1.26.10-1.1"
 export KUBE_VERSION_SHORT="v1.26"
 export PODCIDR="172.20.0.0/16"
 export SVCCIDR="172.21.0.0/16"
-export MASTER_PRIV_IP="10.10.10.162"
-export WORKER_01_IP="10.10.10.53"
-export BASTION_NOST_IP="10.10.1.138"
-export STAGE_MASTER_IP="10.10.13.105"
-export STAGE_WORKER_IP="10.10.13.10"
-export BASTION_NOST_FQDN="demo-a-bastion-01.rancher-demo.io"
-export BASTION_NOST_FQDN_SHORT="demo-a-bastion-01"
-export MASTER_NODE_FQDN="demo-a-mgmt-master-01.rancher-demo.io"
-export MASTER_NODE_FQDN_SHORT="demo-a-mgmt-master-01"
-export WORKER_NODE_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
-export WORKER_NODE_FQDN_SHORT="demo-a-mgmt-worker-01"
-export STAGE_MASTER_FQDN="demo-a-stage-master-01.rancher-demo.io"
-export STAGE_MASTER_FQDN_SHORT="demo-a-stage-master-01"
-export STAGE_WORKER_FQDN="demo-a-stage-worker-01.rancher-demo.io"
-export STAGE_WORKER_FQDN_SHORT="demo-a-stage-worker-01"
+
+#------------------------------
+
+# Set required variables for hostnames
+export BASTION_HOST_IP="10.10.1.138"
+export MGMT_MASTER_01_IP="10.10.10.162"
+export MGMT_WORKER_01_IP="10.10.10.53"
+export PROD_MASTER_01_IP="10.10.11.178"
+export PROD_WORKER_01_IP="10.10.11.5"
+export PROD_WORKER_02_IP="10.10.11.253"
+export STAGE_MASTER_01_IP="10.10.12.77"
+export STAGE_WORKER_01_IP="10.10.12.227"
+export BASTION_HOST_FQDN="demo-a-bastion-01.rancher-demo.io"
+export BASTION_HOST_FQDN_SHORT="demo-a-bastion-01"
+export MGMT_MASTER_01_FQDN="demo-a-mgmt-master-01.rancher-demo.io"
+export MGMT_MASTER_01_FQDN_SHORT="demo-a-mgmt-master-01"
+export MGMT_WORKER_01_FQDN="demo-a-mgmt-worker-01.rancher-demo.io"
+export MGMT_WORKER_01_FQDN_SHORT="demo-a-mgmt-worker-01"
+export PROD_MASTER_01_FQDN="demo-a-prod-master-01.rancher-demo.io"
+export PROD_MASTER_01_FQDN_SHORT="demo-a-prod-master-01"
+export PROD_WORKER_01_FQDN="demo-a-prod-worker-01.rancher-demo.io"
+export PROD_WORKER_01_FQDN_SHORT="demo-a-prod-worker-01"
+export PROD_WORKER_02_FQDN="demo-a-prod-worker-01.rancher-demo.io"
+export PROD_WORKER_02_FQDN_SHORT="demo-a-prod-worker-01"
+export STAGE_MASTER_01_FQDN="demo-a-stage-master-01.rancher-demo.io"
+export STAGE_MASTER_01_FQDN_SHORT="demo-a-stage-master-01"
+export STAGE_WORKER_01_FQDN="demo-a-stage-worker-01.rancher-demo.io"
+export STAGE_WORKER_01_FQDN_SHORT="demo-a-stage-worker-01"
 
 #------------------------------------------------------
 
@@ -43,16 +56,19 @@ export STAGE_WORKER_FQDN_SHORT="demo-a-stage-worker-01"
 sudo sed -i 's\preserve_hostname: false\preserve_hostname: true\g' /etc/cloud/cloud.cfg
 
 # Set Hostname
-sudo hostnamectl set-hostname $STAGE_MASTER_FQDN
+sudo hostnamectl set-hostname $STAGE_MASTER_01_FQDN
 
 # Edit the /etc/hosts file to add the local hostname
-sudo sed -i "s\127.0.0.1 localhost\127.0.0.1  $STAGE_MASTER_FQDN $STAGE_MASTER_FQDN_SHORT\g" /etc/hosts
+sudo sed -i "s\127.0.0.1 localhost\127.0.0.1  $STAGE_MASTER_01_FQDN $STAGE_MASTER_01_FQDN_SHORT\g" /etc/hosts
 # Edit the /etc/hosts file to add other hostname
 sudo cat << EOF >> /etc/hosts
-$BASTION_NOST_IP         $BASTION_NOST_FQDN $BASTION_NOST_FQDN_SHORT
-$WORKER_01_IP         $WORKER_NODE_FQDN $WORKER_NODE_FQDN_SHORT
-$MASTER_PRIV_IP         $MASTER_NODE_FQDN $MASTER_NODE_FQDN_SHORT
-$STAGE_WORKER_IP         $STAGE_WORKER_FQDN $STAGE_WORKER_FQDN_SHORT
+$BASTION_HOST_IP         $BASTION_HOST_FQDN $BASTION_HOST_FQDN_SHORT
+$MGMT_MASTER_01_IP       $MGMT_MASTER_01_FQDN $MGMT_MASTER_01_FQDN_SHORT
+$MGMT_WORKER_01_IP       $MGMT_WORKER_01_FQDN $MGMT_WORKER_01_FQDN_SHORT
+$PROD_MASTER_01_IP       $PROD_MASTER_01_FQDN $PROD_MASTER_01_FQDN_SHORT
+$PROD_WORKER_01_IP       $PROD_WORKER_01_FQDN $PROD_WORKER_01_FQDN_SHORT
+$PROD_WORKER_02_IP       $PROD_WORKER_02_FQDN $PROD_WORKER_02_FQDN_SHORT
+$STAGE_WORKER_01_IP      $STAGE_WORKER_01_FQDN $STAGE_WORKER_01_FQDN_SHORT
 EOF
 
 #------------------------------------------------------
@@ -120,3 +136,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 
 #------------------------------------------------------------
+
+# Install Calico CNI
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
